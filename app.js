@@ -11,6 +11,7 @@ import cors from "cors";
 
 import "./config/db.config.js";
 import matriculasRoutes from "./routes/matriculas.routes.js";
+import userRoutes from "./routes/users.routes.js";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(logger("dev"));
 app.use(express.json());
 
 app.use("/matriculas", matriculasRoutes);
+app.use("/", userRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
