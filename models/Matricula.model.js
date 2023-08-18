@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 const matriculaSchema = new Schema(
   {
-    status: { type: String, required: true },
+    status: { type: Boolean, default: false },
     codigo: { type: Number, unique: true },
     qtdAtos: Number,
     validada: { type: Boolean, default: false },

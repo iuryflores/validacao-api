@@ -7,9 +7,21 @@ const router = Router();
 //Get all matriculas
 router.get("/", async (req, res, next) => {
   try {
-    const allProcess = await Matricula.find({ status: true });
-    return res.status(200).json(allProcess);
+    const matriculas = await Matricula.find({ status: false });
+    return res.status(200).json(matriculas);
   } catch (error) {
+    next(error);
+  }
+});
+router.get("/:id", async (req, res, next) => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const matriculas = await Matricula.findById(id);
+    console.log(matriculas);
+    return res.status(200).json(matriculas);
+  } catch (error) {
+    console.log(error);
     next(error);
   }
 });
