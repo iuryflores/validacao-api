@@ -7,9 +7,11 @@ const router = Router();
 //Get all matriculas
 router.get("/", async (req, res, next) => {
   try {
+
     const matriculas = await Matricula.find().sort({
       codigo: 1,
     }).limit(12000);
+
     return res.status(200).json(matriculas);
   } catch (error) {
     next(error);
