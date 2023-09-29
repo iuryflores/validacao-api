@@ -7,20 +7,30 @@ const router = Router();
 
 //Create User
 router.post("/user/auth/signup", async (req, res, next) => {
-  let { newUsername, confirmPassword, departament, house } = req.body;
+  let { newUsername, confirmPassword, departament, house, newEmail } = req.body;
+
+  console.log(req.body);
   try {
     //Get data from body
 
     //Check if all fields are filled
-    if (!newUsername || !confirmPassword || !departament || !house) {
+    if (
+      !newUsername ||
+      !confirmPassword ||
+      !departament ||
+      !house ||
+      !newEmail
+    ) {
       return res.status(400).json({ msg: "Todos os campos são obrigatórios!" });
     }
 
+    const email = newEmail + "@1rigo.com";
+
     //Check if user exists
-    const foundedUser = await User.findOne({ full_name: newUsername });
+    const foundedUser = await User.findOne({ email });
     if (foundedUser) {
       return res.status(400).json({
-        msg: `Já existe um usuário com o nome: '${foundedUser.full_name}'!`,
+        msg: `Já existe um usuário com esse email: '${foundedUser.email}'@1rigo.com!`,
       });
     }
 
@@ -33,6 +43,7 @@ router.post("/user/auth/signup", async (req, res, next) => {
       full_name: newUsername,
       departament,
       house,
+      email,
       passwordHash,
     });
 
@@ -48,15 +59,21 @@ router.post("/user/auth/signup", async (req, res, next) => {
 
 //Login
 router.post("/user/auth/login", async (req, res, next) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
+
+  const LoginEmail = email + "@1rigo.com";
+
+  console.log(req.body);
 
   try {
     //Look for user by email
-    const user = await User.findOne({ full_name: username });
+    const user = await User.findOne({ email: LoginEmail, status: true });
+
+    console.log(user);
 
     //Check if email was founded
     if (!user) {
-      return res.status(404).json({ msg: "Usuário não encontrado!" });
+      return res.status(404).json({ msg: "Usuário não encontrado/ativado!" });
     }
 
     //Compare the password if matchs
@@ -80,5 +97,7 @@ router.post("/user/auth/login", async (req, res, next) => {
     next(error);
   }
 });
+
+
 
 export default router;
