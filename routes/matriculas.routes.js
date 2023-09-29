@@ -7,9 +7,11 @@ const router = Router();
 //Get all matriculas
 router.get("/", async (req, res, next) => {
   try {
-    const matriculas = await Matricula.find({ validada: false }).sort({
+
+    const matriculas = await Matricula.find().sort({
       codigo: 1,
-    }).limit(5000);
+    }).limit(12000);
+
     return res.status(200).json(matriculas);
   } catch (error) {
     next(error);
@@ -17,10 +19,9 @@ router.get("/", async (req, res, next) => {
 });
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
-  console.log(id);
+
   try {
     const matriculas = await Matricula.findById(id);
-    console.log(matriculas);
     return res.status(200).json(matriculas);
   } catch (error) {
     console.log(error);
