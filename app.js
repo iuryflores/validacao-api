@@ -15,16 +15,21 @@ import userRoutes from "./routes/users.routes.js";
 import userPrivateRoutes from "./routes/userPrivate.routes.js";
 import atosRoutes from "./routes/atos.routes.js";
 
+import authMiddleware from "./middlewares/auth.middlewares.js";
+
 const app = express();
 
 app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 
+app.use("/", userRoutes);
+
+app.use(authMiddleware);
+
+app.use("/user/", userPrivateRoutes);
 app.use("/matriculas", matriculasRoutes);
 app.use("/atos", atosRoutes);
-app.use("/", userRoutes);
-app.use("/user/", userPrivateRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

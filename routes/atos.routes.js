@@ -90,5 +90,50 @@ router.post("/", async (req, res, next) => {
     next(error);
   }*/
 });
+router.get("/atos-validados/:userName", async (req, res, next) => {
+  const { userName } = req.params;
+
+  try {
+    const atosValidados = await Atos.find({ userName: userName });
+    return res.status(200).json(atosValidados);
+  } catch (error) {
+    console.log(error);
+  }
+});
+router.get("/validados/ranking", async (req, res, next) => {
+  try {
+    const atosByHouse = await Atos.aggregate([
+      {
+        $lookup: {
+          from: "users", // Nome da coleção
+          localField: "userName", // Campo do modelo Atos
+          foreignField: "full_name", // Campo do modelo Users
+          as: "userDetails",
+        },
+      },
+      {
+        $group: {
+          _id: "$userDetails.house", // Agrupar pela casa
+          count: { $sum: 1 }, // Contar a quantidade de atos
+        },
+      },
+    ]);
+
+    // Formatando o resultado para um objeto mais legível
+    const result = {};
+    atosByHouse.map((item) => {
+      const house = item._id[0]; // A casa será o primeiro item do array
+      const count = item.count;
+      result[house] = count;
+    });
+    console.log(atosByHouse);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({
+      error: "Ocorreu um erro ao buscar a quantidade de atos por casa.",
+    });
+  }
+});
 
 export default router;

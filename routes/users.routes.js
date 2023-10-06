@@ -5,6 +5,24 @@ import jwt from "jsonwebtoken";
 
 const router = Router();
 
+// Função para gerar um token JWT
+const generateJwtToken = (userId) => {
+  const expirationTimeInSeconds = 3600; // Tempo de expiração em segundos (por exemplo, 1 hora)
+  const expirationTimestamp =
+    Math.floor(Date.now() / 1000) + expirationTimeInSeconds;
+
+  // Gere o token JWT
+  const token = jwt.sign(
+    { userId, exp: expirationTimestamp },
+    process.env.JWT_SECRET
+  );
+
+  return {
+    token,
+    expirationTimestamp,
+  };
+};
+
 //Create User
 router.post("/user/auth/signup", async (req, res, next) => {
   let { newUsername, confirmPassword, departament, house, newEmail } = req.body;
@@ -63,13 +81,9 @@ router.post("/user/auth/login", async (req, res, next) => {
 
   const LoginEmail = email + "@1rigo.com";
 
-  console.log(req.body);
-
   try {
     //Look for user by email
     const user = await User.findOne({ email: LoginEmail, status: true });
-
-    console.log(user);
 
     //Check if email was founded
     if (!user) {
@@ -87,17 +101,23 @@ router.post("/user/auth/login", async (req, res, next) => {
     //Create payload
     const payload = { id: user._id, email: user.email };
 
-    //Create token
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "8h",
-    });
+    const userId = user._id;
 
-    res.status(200).json({ ...payload, token });
+    // Create token
+    const { token, expirationTimestamp } = generateJwtToken(user._id);
+    console.log(token);
+    console.log(expirationTimestamp);
+    res.status(200).json({ token, expirationTimestamp, userId });
+
+    //Create token
+    /* const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "8h",
+    });*/
+
+    /* res.status(200).json({ ...payload, token });*/
   } catch (error) {
     next(error);
   }
 });
-
-
 
 export default router;
