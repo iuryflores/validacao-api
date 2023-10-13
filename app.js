@@ -28,7 +28,7 @@ app.use("/", userRoutes);
 app.use(authMiddleware);
 
 app.use("/user/", userPrivateRoutes);
-app.use("/matriculas", matriculasRoutes);
+app.use("/matriculas/", matriculasRoutes);
 app.use("/atos", atosRoutes);
 
 app.listen(process.env.PORT, () => {
