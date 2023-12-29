@@ -2,12 +2,10 @@ import { Schema, model } from "mongoose";
 
 const users = new Schema(
   {
+    iduserasgard: String,
     full_name: { type: String, required: true },
-    email: {
-      type: String,
-      required: true,
-      match: /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/,
-    },
+    login: { type: String },
+    email: { type: String },
     departament: String,
     matricula_atual: Number,
     passwordHash: { type: String, required: true },

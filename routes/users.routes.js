@@ -24,7 +24,7 @@ const generateJwtToken = (userId) => {
 };
 
 //Create User
-router.post("/user/auth/signup", async (req, res, next) => {
+router.post("/signup", async (req, res, next) => {
   let { newUsername, confirmPassword, departament, house, newEmail } = req.body;
 
   console.log(req.body);
@@ -76,15 +76,15 @@ router.post("/user/auth/signup", async (req, res, next) => {
 });
 
 //Login
-router.post("/user/auth/login", async (req, res, next) => {
+router.post("/login", async (req, res, next) => {
   const { email, password } = req.body;
 
   const LoginEmail = email + "@1rigo.com";
-
+  console.log(LoginEmail);
   try {
     //Look for user by email
     const user = await User.findOne({ email: LoginEmail, status: true });
-
+    console.log(user);
     //Check if email was founded
     if (!user) {
       return res.status(404).json({ msg: "Usuário não encontrado/ativado!" });

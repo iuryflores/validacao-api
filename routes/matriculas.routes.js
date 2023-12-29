@@ -1,14 +1,15 @@
 import { Router } from "express";
-import Matricula from "../models/Matricula.model.js";
+
 import fs from "fs/promises";
 import Users from "../models/Users.model.js";
+import IndicadorReal from "../models/IndicadorReal.model.js";
 
 const router = Router();
 
 //Get all matriculas
 router.get("/", async (req, res, next) => {
   try {
-    const matriculas = await Matricula.find()
+    const matriculas = await IndicadorReal.find()
       .sort({
         codigo: 1,
       })
@@ -23,7 +24,7 @@ router.get("/:matriculaCodigo", async (req, res, next) => {
   const { matriculaCodigo } = req.params;
 
   try {
-    const matriculas = await Matricula.findOne({ codigo: matriculaCodigo });
+    const matriculas = await IndicadorReal.findOne({ codigo: matriculaCodigo });
     return res.status(200).json(matriculas);
   } catch (error) {
     console.log(error);
@@ -33,7 +34,9 @@ router.get("/:matriculaCodigo", async (req, res, next) => {
 
 router.get("/matricula/", async (req, res, next) => {
   try {
-    const matriculasNaoValidadas = await Matricula.find({ validada: false });
+    const matriculasNaoValidadas = await IndicadorReal.find({
+      validada: false,
+    });
 
     // Verifique se há alguma matrícula não validada
     if (matriculasNaoValidadas.length === 0) {
@@ -64,7 +67,7 @@ router.post("/inserir", async (req, res) => {
 
     // Inserir cada documento no banco de dados
     for (const item of dados) {
-      const novoDocumento = new Matricula(item);
+      const novoDocumento = new IndicadorReal(item);
       await novoDocumento.save();
     }
 
@@ -80,11 +83,12 @@ router.get("/aleatoria/battle/", async (req, res, next) => {
   const { userId } = req.user;
   try {
     // Buscar uma matrícula não validada aleatória
-    const matriculaAleatoria = await Matricula.findOne({
-      validada: false,
+    const matriculaAleatoria = await IndicadorReal.findOne({
+      validada: false || null,
     }).skip(
       Math.floor(
-        Math.random() * (await Matricula.countDocuments({ validada: false }))
+        Math.random() *
+          (await IndicadorReal.countDocuments({ validada: false || null }))
       )
     );
 
@@ -95,7 +99,7 @@ router.get("/aleatoria/battle/", async (req, res, next) => {
         .json({ msg: "Nenhuma matrícula não validada encontrada." });
     }
 
-    const existeMatricula = await Users.find({
+    const existeIndicadorReal = await Users.find({
       _id: userId,
       $or: [
         { matricula_atual: { $exists: true } },
@@ -103,17 +107,17 @@ router.get("/aleatoria/battle/", async (req, res, next) => {
       ],
     });
 
-    if (existeMatricula && existeMatricula.length > 0) {
+    if (existeIndicadorReal && existeIndicadorReal.length > 0) {
       return res.status(200).json({
-        matricula_atual: existeMatricula.matricula_atual,
+        matricula_atual: existeIndicadorReal.matricula_atual,
         msg: "Finalize essa matrícula antes de solicitar uma nova.",
       });
     } else {
-      const setMatricula = await Users.findByIdAndUpdate(userId, {
+      const setIndicadorReal = await Users.findByIdAndUpdate(userId, {
         $set: { matricula_atual: matriculaAleatoria.codigo },
       });
 
-      if (setMatricula !== null) {
+      if (setIndicadorReal !== null) {
         return res.status(200).json(matriculaAleatoria);
       } else {
         return res
@@ -130,7 +134,7 @@ router.get("/aleatoria/battle/", async (req, res, next) => {
 //Get all matriculas
 router.delete("/", async (req, res, next) => {
   try {
-    const matriculas = await Matricula.deleteMany();
+    const matriculas = await IndicadorReal.deleteMany();
     return res.status(200).json(matriculas);
   } catch (error) {
     next(error);
