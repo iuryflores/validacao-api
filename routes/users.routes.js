@@ -24,7 +24,7 @@ const generateJwtToken = (userId) => {
 };
 
 //Create User
-router.post("/user/auth/signup", async (req, res, next) => {
+router.post("/signup", async (req, res, next) => {
   let { newUsername, confirmPassword, departament, house, newEmail } = req.body;
 
   console.log(req.body);
@@ -76,10 +76,12 @@ router.post("/user/auth/signup", async (req, res, next) => {
 });
 
 //Login
-router.post("/user/auth/login", async (req, res, next) => {
+router.post("/login", async (req, res, next) => {
   const { email, password } = req.body;
 
   const LoginEmail = email + "@1rigo.com";
+
+  const currentDate = new Date();
 
   try {
     //Look for user by email
@@ -105,9 +107,10 @@ router.post("/user/auth/login", async (req, res, next) => {
 
     // Create token
     const { token, expirationTimestamp } = generateJwtToken(user._id);
-    console.log(token);
-    console.log(expirationTimestamp);
-    res.status(200).json({ token, expirationTimestamp, userId });
+    if (token) {
+      await User.findByIdAndUpdate(userId, { lastLogin: currentDate });
+      return res.status(200).json({ token, expirationTimestamp, userId });
+    }
 
     //Create token
     /* const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -116,6 +119,7 @@ router.post("/user/auth/login", async (req, res, next) => {
 
     /* res.status(200).json({ ...payload, token });*/
   } catch (error) {
+    console.log(error);
     next(error);
   }
 });
