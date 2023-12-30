@@ -4,7 +4,7 @@ import Matricula from "../models/Matricula.model.js";
 
 const router = Router();
 
-//Get all matriculas
+//GET ALL ATOS VALIDADOS
 router.get("/validados", async (req, res, next) => {
   try {
     const atosValidados = await Atos.find({ validado: true });
@@ -13,6 +13,7 @@ router.get("/validados", async (req, res, next) => {
     next(error);
   }
 });
+//GET ALL ATOS NAO VALIDADOS
 router.get("/nao-validados", async (req, res, next) => {
   try {
     const atosValidados = await Atos.find({ validado: false });
@@ -21,16 +22,20 @@ router.get("/nao-validados", async (req, res, next) => {
     next(error);
   }
 });
+//GET ATOS VALIDADOS DE UMA MATRÍCULA
 router.get("/validados/matricula/:matricula", async (req, res, next) => {
   const { matricula } = req.params;
 
   const findedMatricula = await Matricula.findOne({ codigo: matricula });
+  console.log("Matricula encontrada (validados): ", findedMatricula);
 
   try {
     const findedAtos = await Atos.find({
-      matriculaCodigo: findedMatricula.codigo,
+      matricula: findedMatricula.codigo,
       validado: true,
     }).sort({ ato: 1 });
+
+    console.log("Atos validados: ", findedAtos);
 
     return res.status(200).json(findedAtos);
   } catch (error) {
@@ -38,18 +43,23 @@ router.get("/validados/matricula/:matricula", async (req, res, next) => {
     next(error);
   }
 });
+//GET ATOS NAO VALIDADOS DE UMA MATRÍCULA
 router.get("/nao-validados/matricula/:matricula", async (req, res, next) => {
   const { matricula } = req.params;
 
   const findedMatricula = await Matricula.findOne({ codigo: matricula });
 
+  console.log("Matricula encontrada (nao validados): ", findedMatricula);
+
   try {
     const atosNaoValidados = await Atos.find({
-      matriculaCodigo: findedMatricula.codigo,
+      matricula: findedMatricula.codigo,
       validado: false,
     }).sort({ ato: 1 });
+    console.log("Atos nao validados: ", atosNaoValidados);
     return res.status(200).json(atosNaoValidados);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 });
@@ -72,6 +82,7 @@ router.post("/", async (req, res, next) => {
     next(error);
   }*/
 });
+//GET ATOS VALIDADOS POR USUARIO
 router.get("/atos-validados/:userName", async (req, res, next) => {
   const { userName } = req.params;
 
@@ -82,6 +93,7 @@ router.get("/atos-validados/:userName", async (req, res, next) => {
     console.log(error);
   }
 });
+//GET ALL ATOS
 router.get("/validados/geral", async (req, res, next) => {
   try {
     const atosValidados = await Atos.find();
@@ -92,6 +104,7 @@ router.get("/validados/geral", async (req, res, next) => {
     return res.status(500).json({ msg: error });
   }
 });
+//GET ATOS VALIDADOS POR FILTRO
 router.get("/validados/filtrados/:inicio/:fim", async (req, res, next) => {
   const { inicio, fim } = req.params;
 
@@ -145,6 +158,7 @@ router.get("/validados/filtrados/:inicio/:fim", async (req, res, next) => {
     });
   }
 });
+//GET ATOS AGRUPADOS POR CASA
 router.get("/validados/ranking", async (req, res, next) => {
   try {
     const atosByHouse = await Atos.aggregate([
@@ -181,7 +195,7 @@ router.get("/validados/ranking", async (req, res, next) => {
     });
   }
 });
-
+//VALIDANDO ATO
 router.post("/validar/", async (req, res, next) => {
   const { selectedAtos, matricula, userData } = req.body;
   console.log(selectedAtos);

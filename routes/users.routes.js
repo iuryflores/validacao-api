@@ -80,11 +80,13 @@ router.post("/login", async (req, res, next) => {
   const { email, password } = req.body;
 
   const LoginEmail = email + "@1rigo.com";
-  console.log(LoginEmail);
+
+  const currentDate = new Date();
+
   try {
     //Look for user by email
     const user = await User.findOne({ email: LoginEmail, status: true });
-    console.log(user);
+
     //Check if email was founded
     if (!user) {
       return res.status(404).json({ msg: "Usuário não encontrado/ativado!" });
@@ -105,9 +107,10 @@ router.post("/login", async (req, res, next) => {
 
     // Create token
     const { token, expirationTimestamp } = generateJwtToken(user._id);
-    console.log(token);
-    console.log(expirationTimestamp);
-    res.status(200).json({ token, expirationTimestamp, userId });
+    if (token) {
+      await User.findByIdAndUpdate(userId, { lastLogin: currentDate });
+      return res.status(200).json({ token, expirationTimestamp, userId });
+    }
 
     //Create token
     /* const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -116,6 +119,7 @@ router.post("/login", async (req, res, next) => {
 
     /* res.status(200).json({ ...payload, token });*/
   } catch (error) {
+    console.log(error);
     next(error);
   }
 });

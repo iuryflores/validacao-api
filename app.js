@@ -17,6 +17,7 @@ import userRoutes from "./routes/users.routes.js";
 import userPrivateRoutes from "./routes/userPrivate.routes.js";
 import atosRoutes from "./routes/atos.routes.js";
 import transformData from "./routes/transformarData.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 
 import authMiddleware from "./middlewares/auth.middlewares.js";
 
@@ -34,6 +35,7 @@ app.use("/user/", userPrivateRoutes);
 app.use("/matriculas/", matriculasRoutes);
 app.use("/atos", atosRoutes);
 app.use("/transform/", transformData);
+app.use("/admin/", adminRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

@@ -12,6 +12,7 @@ const users = new Schema(
     house: { type: String },
     status: { type: Boolean, default: false },
     admin: { type: Boolean, default: false },
+    lastLogin: Date,
   },
   { timestamps: true }
 );
